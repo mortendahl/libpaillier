@@ -132,7 +132,7 @@ paillier_enc( paillier_ciphertext_t* res,
 	while( mpz_cmp(r, pub->n) >= 0 );
 
 	/* compute ciphertext */
-	
+
 	if( !res )
 	{
 		res = (paillier_ciphertext_t*) malloc(sizeof(paillier_ciphertext_t));
@@ -140,7 +140,9 @@ paillier_enc( paillier_ciphertext_t* res,
 	}
 
 	mpz_init(x);
-	mpz_powm(res->c, pub->n_plusone, pt->m, pub->n_squared);
+	mpz_mul(res->c, pt->m, pub->n);
+	mpz_add_ui(res->c, res->c, 1);
+	mpz_mod(res->c, res->c, pub->n_squared);
 	mpz_powm(x, r, pub->n, pub->n_squared);
 
 	mpz_mul(res->c, res->c, x);
@@ -197,10 +199,10 @@ paillier_plaintext_t*
 paillier_plaintext_from_ui( unsigned long int x )
 {
 	paillier_plaintext_t* pt;
-	
+
 	pt = (paillier_plaintext_t*) malloc(sizeof(paillier_plaintext_t));
 	mpz_init_set_ui(pt->m, x);
-	
+
 	return pt;
 }
 
@@ -278,7 +280,7 @@ paillier_ciphertext_from_bytes( void* c, int len )
 	return ct;
 }
 
-void* 
+void*
 paillier_ciphertext_to_bytes( int len,
 															paillier_ciphertext_t* ct )
 {
@@ -397,7 +399,7 @@ paillier_get_rand_devurandom( void* buf, int len )
 	paillier_get_rand_file(buf, len, "/dev/urandom");
 }
 
-paillier_ciphertext_t* 
+paillier_ciphertext_t*
 paillier_create_enc_zero()
 {
 	paillier_ciphertext_t* ct;
